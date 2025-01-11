@@ -5,7 +5,8 @@ def connect_db():
         host="localhost",
         user="root",
         password="12345",
-        database="Analisis"
+        database="Analisis",
+        cursorclass=pymysql.cursors.Cursor  # Para devolver resultados en formato legible
     )
 
 def ejecutar_query(query, params=None):
@@ -14,7 +15,12 @@ def ejecutar_query(query, params=None):
         with conexion.cursor() as cursor:
             cursor.execute(query, params)
             if query.strip().upper().startswith("SELECT"):
+                # Devuelve todos los resultados como una lista de tuplas
                 return cursor.fetchall()
-            conexion.commit()
+            else:
+                conexion.commit()
+                return None
+    except Exception as e:
+        raise RuntimeError(f"Error al ejecutar la consulta: {e}")
     finally:
         conexion.close()
